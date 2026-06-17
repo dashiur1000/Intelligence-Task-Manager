@@ -4,18 +4,19 @@ class DB_connection:
 
     def __init__(self):
         self.host = "localhost"
+        self.port = 3306
         self.user = "root"
         self.password = "1234"
         self.database = "intelligence-mysql"
 
     def get_connection(self):
-        config = {"host": self.host,
-                  "user": self.user,
-                  "password": self.password,
-                  "database": self.database}
+        config = {"host": "localhost",
+                  "port": 3306,
+                  "user": "root",
+                  "password": "1234",
+                  "database": "intelligence-mysql"}
         conn = mysql.connector.connect(**config)
         return conn
-
 
 
     def create_database(self):
