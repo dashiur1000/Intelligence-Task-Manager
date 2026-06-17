@@ -49,10 +49,10 @@ class DB_connection:
             CREATE TABLE IF NOT EXISTS missions(
             id INT AUTO_INCREMENT PRIMARY KEY,
             title VARCHAR(100) NOT NULL,
-            description TEXT(100) NOT NULL,
+            description TEXT NOT NULL,
             location VARCHAR(100) NOT NULL,
             difficulty INT CHECK(difficulty BETWEEN 1 AND 10) NOT NULL,
-            importance INT CHECK(difficulty BETWEEN 1 AND 10) NOT NULL,
+            importance INT CHECK(importance BETWEEN 1 AND 10) NOT NULL,
             status ENUM('NEW', 'ASSIGNED', 'PROGRESS_IN', 'COMPLETED', 'FAILED', 'CANCELLED'),
             level_risk VARCHAR(100),
             assigned_agent_id INT DEFAULT NULL
