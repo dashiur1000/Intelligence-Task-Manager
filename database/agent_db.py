@@ -66,7 +66,7 @@ class AgentDB:
         try:
             conn = self.conn
             cursor = conn.cursor(dictionary=True)
-            sql = "UPDATE agents SET is_active 0 WHERE id = %s"
+            sql = "UPDATE agents SET is_active = 0 WHERE id = %s"
             cursor.execute(sql, id)
             conn.commit()
             cursor.close()
