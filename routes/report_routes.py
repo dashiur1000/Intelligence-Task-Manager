@@ -10,6 +10,7 @@ agent_db2 = AgentDB(DB_connection)
 
 @router.get("/reports/summary")
 def get_summary():
+    logger.info("GET /reports/summary")
     return {"active_agents_count": agent_db2.count_active_agent(),
             "total_missions": mission_db2.count_all_missions(),
             "open_missions": mission_db2.count_open_missions}
@@ -17,4 +18,5 @@ def get_summary():
 
 @router.get("/reports/top-agent")
 def get_top():
+    logger.info("GET /reports/top-agent")
     return agent_db2.get_top()

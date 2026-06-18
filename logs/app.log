@@ -1,0 +1,6 @@
+2026-06-18 15:48:39,145 | INFO | Connecting to a database
+2026-06-18 15:49:01,490 | INFO | Connecting to a database
+2026-06-18 15:49:01,511 | INFO | Connecting to a database
+2026-06-18 15:49:16,531 | INFO | post /agents
+2026-06-18 15:49:16,531 | INFO | create new agent
+2026-06-18 15:49:16,531 | ERROR | Invalid rank entered

@@ -1,8 +1,10 @@
 from fastapi import HTTPException
+from database.db_connection import logger
 
 class MissionDB:
     def __init__(self, DB_connection):
         self.conn = DB_connection()
+        logger.info("Connecting to a database")
 
     def create_mission(self, data):
         conn = self.conn.get_connections()
@@ -13,12 +15,15 @@ class MissionDB:
             cursor.execute(sql, val)
             conn.commit()
             num_id = cursor.lastrowid
+            logger.info("create mission")
             return self.get_mission_by_id(num_id)
         except:
+            logger.error("Integrity error")
             raise HTTPException(status_code=422)
         finally:
             conn.close()
             cursor.close()
+
 
     def get_all_missions(self):
         try:
