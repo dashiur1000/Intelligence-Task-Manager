@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 class MissionDB:
     def __init__(self, DB_connection):
         self.conn = DB_connection()
@@ -5,14 +7,18 @@ class MissionDB:
     def create_mission(self, data):
         conn = self.conn.get_connections()
         cursor = conn.cursor()
-        sql = "INSERT INTO missions (title, description, location, difficulty, importance, status, level_risk) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        val = (data["title"], data["description"], data["location"], data["difficulty"], data["importance"], self.definition_risk_level(data["difficulty"], data["importance"]))
-        cursor.execute(sql, val)
-        conn.commit()
-        conn.close()
-        cursor.close()
-        num_id = cursor.lastrowid
-        return self.get_mission_by_id(num_id)
+        try:
+            sql = "INSERT INTO missions (title, description, location, difficulty, importance, status, level_risk) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            val = (data["title"], data["description"], data["location"], data["difficulty"], data["importance"], self.definition_risk_level(data["difficulty"], data["importance"]))
+            cursor.execute(sql, val)
+            conn.commit()
+            num_id = cursor.lastrowid
+            return self.get_mission_by_id(num_id)
+        except:
+            raise HTTPException(status_code=422)
+        finally:
+            conn.close()
+            cursor.close()
 
     def get_all_missions(self):
         try:
@@ -36,14 +42,12 @@ class MissionDB:
             return []
 
     def get_mission_by_id(self, id):
+        conn = self.conn.get_connections()
+        cursor = conn.cursor(dictionary=True)
         try:
-            conn = self.conn
-            cursor = conn.cursor(dictionary=True)
             sql = "SELECT * FROM missions WHERE id = %s"
-            cursor.execute(sql, id)
-            result = cursor.fetchall()
-            cursor.close()
-            conn.close()
+            cursor.execute(sql, (id,))
+            result = cursor.fetchone()
             return {"id": result["id"],
                     "title": result["title"],
                     "description": result["description"],
@@ -54,7 +58,10 @@ class MissionDB:
                     "risk_level": result["risk_level"],
                     "assigned_agent_id": result["assigned_agent_id"]}
         except:
-            return None
+            raise HTTPException(status_code=404)
+        finally:
+            cursor.close()
+            conn.close()
 
     def assign_mission(self, m_id, a_id):
         try:

@@ -79,6 +79,9 @@ class AgentDB:
         try:
             sql = "UPDATE agents SET is_active = 0 WHERE id = %s"
             cursor.execute(sql, (id,))
+            changed = cursor.rowcont
+            if changed == 0:
+                raise HTTPException(status_code=404)
             conn.commit()
             return "The operation was successful"
         except:
