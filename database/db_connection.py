@@ -9,7 +9,7 @@ class DB_connection:
         self.password = "1234"
         self.database = "Intelligence_db"
 
-    def _get_connection(self):
+    def get_connections(self):
         conn = mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database)
         return conn
 
@@ -24,7 +24,7 @@ class DB_connection:
 
 
     def create_tables(self):
-        conn = self._get_connection()
+        conn = self.get_connections()
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -55,8 +55,8 @@ class DB_connection:
         cursor.close()
         conn.close()
 
-db = DB_connection()
+# db = DB_connection()
 
-if __name__ == "__main__":
-    db.create_database()
-    db.create_tables()
+# if __name__ == "__main__":
+#     db.create_database()
+#     db.create_tables()

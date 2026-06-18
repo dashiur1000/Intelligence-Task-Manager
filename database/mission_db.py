@@ -1,9 +1,9 @@
 class MissionDB:
     def __init__(self, DB_connection):
-        self.conn = DB_connection
+        self.conn = DB_connection()
 
     def create_mission(self, data):
-        conn = self.conn
+        conn = self.conn.get_connections()
         cursor = conn.cursor()
         sql = "INSERT INTO missions (title, description, location, difficulty, importance, status, level_risk) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         val = (data["title"], data["description"], data["location"], data["difficulty"], data["importance"], self.definition_risk_level(data["difficulty"], data["importance"]))

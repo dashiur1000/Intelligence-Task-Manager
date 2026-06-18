@@ -1,19 +1,28 @@
+from fastapi import HTTPException
+import mysql
 class AgentDB:
 
     def __init__(self, DB_connection):
-        self.conn = DB_connection
+        self.conn = DB_connection()
 
     def create_agent(self, data):
-        conn = self.conn
-        cursor = conn.cursor()
-        sql = "INSERT INTO agents (name, specialty, agent_rank) VALUES (%s, %s, %s)"
-        val = (data["name"], data["specialty"], data["agent_rank"])
-        cursor.execute(sql, val)
-        conn.commit()
-        conn.close()
-        cursor.close()
-        num_id = cursor.lastrowid
-        return self.get_agent_by_id(num_id)
+        if data == {}:
+            raise HTTPException(status_code=422)
+        if data["agent_rank"] not in ['Junior', 'Senior', 'Commander']:
+            raise HTTPException(status_code=400)
+        try:
+            conn = self.conn.get_connections()
+            cursor = conn.cursor()
+            sql = "INSERT INTO agents (name, specialty, agent_rank) VALUES (%s, %s, %s)"
+            val = (data["name"], data["specialty"], data["agent_rank"])
+            cursor.execute(sql, val)
+            conn.commit()
+            conn.close()
+            cursor.close()
+            return "Agent Created"
+        except:
+            raise HTTPException(status_code=422)
+
 
 
     def get_all_agents_all(self):
@@ -35,13 +44,13 @@ class AgentDB:
             conn = self.conn
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT * FROM agents WHERE id = %s"
-            cursor.execute(sql, id)
-            result = cursor.fetchall()
+            cursor.execute(sql, (id,))
+            result = cursor.fetchone()
             cursor.close()
             conn.close()
             return {"id": result["id"], "name": result["name"], "specialty": result["specialty"], "is_active": result["is_active"], "completed_missions": result["completed_missions"], "failed_missions": result["failed_missions"], "agent_rank": result["agent_rank"]}
-        except:
-            return None
+        except Exception as e:
+            raise HTTPException(status_code=404)
 
 
     def update_agent(self, id, data):
@@ -113,7 +122,8 @@ class AgentDB:
             conn = self.conn
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
-            completed = cursor.execute(sql, id)
+            cursor.execute(sql, id)
+            completed = cursor.fetchone()
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
             failed = cursor.execute(sql, id)
             total = completed + failed
@@ -130,3 +140,5 @@ class AgentDB:
         active = cursor.execute("SELECT COUNT(*) AS counter FROM agents WHERE is_active = TRUE")
         cursor.fetchall()
         return active["count"]
+
+
