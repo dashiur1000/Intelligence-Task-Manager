@@ -74,17 +74,18 @@ class AgentDB:
 
 
     def deactivate_agent(self, id):
+        conn = self.conn.get_connections()
+        cursor = conn.cursor()
         try:
-            conn = self.conn.get_connections()
-            cursor = conn.cursor(dictionary=True)
             sql = "UPDATE agents SET is_active = 0 WHERE id = %s"
-            cursor.execute(sql, id)
+            cursor.execute(sql, (id,))
             conn.commit()
-            cursor.close()
-            conn.close()
             return "The operation was successful"
         except:
             return "The operation was unsuccessful"
+        finally:
+            cursor.close()
+            conn.close()
 
     def increment_completed(self, id):
         try:

@@ -43,4 +43,12 @@ def update_agent(id, data: dict):
 
 @router.put("/agents/{id}/deactivate")
 def deactivate_agent(id):
-    pass
+    try:
+        id = int(id)
+        return agent_db.deactivate_agent(id)
+    except:
+        try:
+            if id == int(id):
+                raise HTTPException(status_code=404)
+        except ValueError:
+            raise HTTPException(status_code=422)
