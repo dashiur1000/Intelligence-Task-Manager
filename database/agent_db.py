@@ -27,7 +27,7 @@ class AgentDB:
 
     def get_all_agents_all(self):
         try:
-            conn = self.conn
+            conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT * FROM agents")
             result = cursor.fetchall()
