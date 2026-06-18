@@ -60,3 +60,15 @@ class DB_connection:
 # if __name__ == "__main__":
 #     db.create_database()
 #     db.create_tables()
+
+import logging
+import os
+
+log_file_path = os.path.join("logs", "app.log")
+
+def add_logging():
+    FORMAT = ("%(asctime)s | %(levelname)s | %(message)s")
+    logging.basicConfig(filename=log_file_path, level=logging.INFO, format=FORMAT)
+    logger1 = logging.getLogger(__name__)
+    return logger1
+logger = add_logging()

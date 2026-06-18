@@ -8,7 +8,10 @@ agent_db = AgentDB(DB_connection)
 
 @router.post("/agents", status_code=201)
 def create_new_agent(data: dict):
-    return agent_db.create_agent(data)
+    try:
+        return agent_db.create_agent(data)
+    except KeyError:
+        raise HTTPException(status_code=400)
 
 @router.get("/agents")
 def get_all_agents_all():

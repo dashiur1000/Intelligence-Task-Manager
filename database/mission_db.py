@@ -86,13 +86,32 @@ class MissionDB:
         pass
 
     def count_all_missions(self):
-        pass
+        conn = self.conn
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT COUNT(*) as cnt FROM missions")
+            total = cursor.fetchone()['cnt']
+            return total
+        finally:
+            cursor.close()
+            conn.close()
+
+
+
 
     def count_by_status(self, status):
         pass
 
     def count_open_missions(self):
-        pass
+        conn = self.conn
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT COUNT(*) as cnt FROM missions WHERE status = PROGRESS_IN")
+            total = cursor.fetchone()['cnt']
+            return total
+        finally:
+            cursor.close()
+            conn.close()
 
     def count_critical_missions(self):
         pass

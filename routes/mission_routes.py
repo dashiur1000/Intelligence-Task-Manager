@@ -7,11 +7,11 @@ mission_db = MissionDB(DB_connection)
 
 
 @router.post("/missions")
-def create_mission(data: dict):
+def create_missions(data: dict):
     return mission_db.create_mission(data)
 
 @router.get("/missions")
-def get_all_missions():
+def get_all_mission():
     return mission_db.get_all_missions()
 
 @router.get("/missions/{id}")

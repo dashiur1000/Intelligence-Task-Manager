@@ -94,9 +94,9 @@ class AgentDB:
         try:
             conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
-            sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
+            sql = "SELECT COUNT(*) as cnt FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
             cursor.execute(sql, (id,))
-            completed = cursor.fetchone()
+            completed = cursor.fetchone()['cnt']
             sql = "UPDATE agents SET completed_missions = %s WHERE id = %s"
             val = (completed, id)
             cursor.execute(sql, val)
@@ -112,9 +112,9 @@ class AgentDB:
         try:
             conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
-            sql = "SELECT COUNT(status) FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
+            sql = "SELECT COUNT(*) as cnt FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
             cursor.execute(sql, (id,))
-            failed = cursor.fetchone()
+            failed = cursor.fetchone()['cnt']
             sql = "UPDATE agents SET completed_missions %s WHERE id = %s"
             val = (failed, id)
             cursor.execute(sql, val)
@@ -129,17 +129,20 @@ class AgentDB:
         conn = self.conn.get_connections()
         cursor = conn.cursor(dictionary=True)
         try:
-            sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
+            sql = "SELECT COUNT(*) as cnt FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
             cursor.execute(sql, (id,))
-            completed = cursor.fetchone()
-            sql = "SELECT COUNT(status) FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
+            completed = cursor.fetchone()['cnt']
+            sql = "SELECT COUNT(*) as cnt FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
             cursor.execute(sql, (id,))
-            failed = cursor.fetchone()
+            failed = cursor.fetchone()['cnt']
             total = completed + failed
-            success_rate = (completed/total) * 100
-            return {"completed": completed, "failed": failed, "total": total, "success_rate": success_rate}
+            if total > 0:
+                success_rate = (completed/total) * 100
+                return {"completed": completed, "failed": failed, "total": total, "success_rate": success_rate}
+            else:
+                raise ZeroDivisionError("ZeroDivisionError")
         except:
-            return "The operation was unsuccessful"
+            raise HTTPException(status_code=404)
         finally:
             cursor.close()
             conn.close()
@@ -147,8 +150,16 @@ class AgentDB:
     def count_active_agent(self):
         conn = self.conn.get_connections()
         cursor = conn.cursor(dictionary=True)
-        active = cursor.execute("SELECT COUNT(*) AS counter FROM agents WHERE is_active = TRUE")
-        cursor.fetchall()
+        cursor.execute("SELECT COUNT(*) AS counter FROM agents WHERE is_active = TRUE")
+        active = cursor.fetchone()
         return active["count"]
+
+    def get_top(self):
+        conn = self.conn.get_connections()
+        cursor = conn.cursor()
+        cursor.execute("SELECT completed_missions FROM agents GROUP BY DESC")
+        completed = cursor.fetchone()
+        return completed
+
 
 
