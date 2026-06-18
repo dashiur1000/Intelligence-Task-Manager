@@ -3,7 +3,7 @@ class AgentDB:
     def __init__(self, DB_connection):
         self.conn = DB_connection
 
-    def agent_create(self, data):
+    def create_agent(self, data):
         conn = self.conn
         cursor = conn.cursor()
         sql = "INSERT INTO agents (name, specialty, agent_rank) VALUES (%s, %s, %s)"
@@ -16,7 +16,7 @@ class AgentDB:
         return self.get_agent_by_id(num_id)
 
 
-    def agents_all_get(self):
+    def get_all_agents_all(self):
         try:
             conn = self.conn
             cursor = conn.cursor(dictionary=True)

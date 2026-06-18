@@ -7,29 +7,24 @@ class DB_connection:
         self.port = 3306
         self.user = "root"
         self.password = "1234"
-        self.database = "intelligence-mysql"
+        self.database = "Intelligence_db"
 
-    def get_connection(self):
-        config = {"host": "localhost",
-                  "port": 3306,
-                  "user": "root",
-                  "password": "1234",
-                  "database": "intelligence-mysql"}
-        conn = mysql.connector.connect(**config)
+    def _get_connection(self):
+        conn = mysql.connector.connect(host=self.host, user=self.user, password=self.password, database=self.database)
         return conn
 
 
+
     def create_database(self):
-        config = {"host": self.host,
-                  "user": self.user,
-                  "password": self.password}
-        conn = mysql.connector.connect(**config)
+        conn = mysql.connector.connect(host= self.host, user= self.user, password= self.password)
         cursor = conn.cursor()
         cursor.execute("CREATE DATABASE IF NOT EXISTS Intelligence_db")
+        cursor.close()
+        conn.close()
 
 
     def create_tables(self):
-        conn = self.get_connection()
+        conn = self._get_connection()
         cursor = conn.cursor()
         cursor.execute(
             """
@@ -43,7 +38,6 @@ class DB_connection:
             agent_rank ENUM('Junior', 'Senior', 'Commander') NOT NULL)
             """
         )
-        conn.commit()
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS missions(
@@ -54,7 +48,7 @@ class DB_connection:
             difficulty INT CHECK(difficulty BETWEEN 1 AND 10) NOT NULL,
             importance INT CHECK(importance BETWEEN 1 AND 10) NOT NULL,
             status ENUM('NEW', 'ASSIGNED', 'PROGRESS_IN', 'COMPLETED', 'FAILED', 'CANCELLED'),
-            level_risk VARCHAR(100),
+            risk_level VARCHAR(100),
             assigned_agent_id INT DEFAULT NULL
             )""")
         conn.commit()
@@ -62,8 +56,7 @@ class DB_connection:
         conn.close()
 
 db = DB_connection()
-db.get_connection()
 
 if __name__ == "__main__":
-    db.get_connection()
     db.create_database()
+    db.create_tables()
