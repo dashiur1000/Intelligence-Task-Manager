@@ -52,3 +52,16 @@ def deactivate_agent(id):
                 raise HTTPException(status_code=404)
         except ValueError:
             raise HTTPException(status_code=422)
+
+@router.get("/agents/{id}/performance")
+def get_agent_performance(id):
+    try:
+        id = int(id)
+        return agent_db.get_agent_performance(id)
+    except:
+        try:
+            if id == int(id):
+                raise HTTPException(status_code=404)
+        except ValueError:
+            raise HTTPException(status_code=422)
+

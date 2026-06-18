@@ -92,8 +92,9 @@ class AgentDB:
             conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
-            completed = cursor.execute(sql, id)
-            sql = "UPDATE agents SET completed_missions %s WHERE id = %s"
+            cursor.execute(sql, (id,))
+            completed = cursor.fetchone()
+            sql = "UPDATE agents SET completed_missions = %s WHERE id = %s"
             val = (completed, id)
             cursor.execute(sql, val)
             conn.commit()
@@ -109,7 +110,8 @@ class AgentDB:
             conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
-            failed = cursor.execute(sql, id)
+            cursor.execute(sql, (id,))
+            failed = cursor.fetchone()
             sql = "UPDATE agents SET completed_missions %s WHERE id = %s"
             val = (failed, id)
             cursor.execute(sql, val)
@@ -121,21 +123,23 @@ class AgentDB:
             return "The operation was unsuccessful"
 
     def get_agent_performance(self, id):
+        conn = self.conn.get_connections()
+        cursor = conn.cursor(dictionary=True)
         try:
-            conn = self.conn.get_connections()
-            cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
-            cursor.execute(sql, id)
+            cursor.execute(sql, (id,))
             completed = cursor.fetchone()
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
-            failed = cursor.execute(sql, id)
+            cursor.execute(sql, (id,))
+            failed = cursor.fetchone()
             total = completed + failed
             success_rate = (completed/total) * 100
-            cursor.close()
-            conn.close()
             return {"completed": completed, "failed": failed, "total": total, "success_rate": success_rate}
         except:
             return "The operation was unsuccessful"
+        finally:
+            cursor.close()
+            conn.close()
 
     def count_active_agent(self):
         conn = self.conn.get_connections()
