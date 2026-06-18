@@ -13,3 +13,12 @@ def create_new_agent(data: dict):
 @router.get("/agents")
 def get_all_agents_all():
     return agent_db.get_all_agents_all()
+
+@router.get("/agents/{id}")
+def get_agent_by_id(id):
+    try:
+        id = int(id)
+        return agent_db.get_agent_by_id(id)
+    except:
+        if id == int(id):
+            raise HTTPException(status_code=404)

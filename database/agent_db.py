@@ -39,23 +39,24 @@ class AgentDB:
             return []
 
 
-    def get_agent_by_id(self, id):
+    def get_agent_by_id(self, id: int):
+        conn = self.conn.get_connections()
+        cursor = conn.cursor(dictionary=True)
         try:
-            conn = self.conn
-            cursor = conn.cursor(dictionary=True)
             sql = "SELECT * FROM agents WHERE id = %s"
             cursor.execute(sql, (id,))
             result = cursor.fetchone()
+            return {"id": result["id"], "name": result["name"], "specialty": result["specialty"], "is_active": result["is_active"], "completed_missions": result["completed_missions"], "failed_missions": result["failed_missions"], "agent_rank": result["agent_rank"]}
+        except:
+            raise HTTPException(status_code=404)
+        finally:
             cursor.close()
             conn.close()
-            return {"id": result["id"], "name": result["name"], "specialty": result["specialty"], "is_active": result["is_active"], "completed_missions": result["completed_missions"], "failed_missions": result["failed_missions"], "agent_rank": result["agent_rank"]}
-        except Exception as e:
-            raise HTTPException(status_code=404)
 
 
     def update_agent(self, id, data):
         try:
-            conn = self.conn
+            conn = self.conn.get_connections()
             cursor = conn.cursor()
             set_parts = [f"{key} = %s" for key in data.keys()]
             set_cluse = ", ".join(set_parts)
@@ -73,7 +74,7 @@ class AgentDB:
 
     def deactivate_agent(self, id):
         try:
-            conn = self.conn
+            conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             sql = "UPDATE agents SET is_active = 0 WHERE id = %s"
             cursor.execute(sql, id)
@@ -86,7 +87,7 @@ class AgentDB:
 
     def increment_completed(self, id):
         try:
-            conn = self.conn
+            conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
             completed = cursor.execute(sql, id)
@@ -103,7 +104,7 @@ class AgentDB:
 
     def increment_failed(self, id):
         try:
-            conn = self.conn
+            conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'FAILED' AND assigned_agent_id = %s"
             failed = cursor.execute(sql, id)
@@ -119,7 +120,7 @@ class AgentDB:
 
     def get_agent_performance(self, id):
         try:
-            conn = self.conn
+            conn = self.conn.get_connections()
             cursor = conn.cursor(dictionary=True)
             sql = "SELECT COUNT(status) FROM missions WHERE status = 'COMPLETED' AND assigned_agent_id = %s"
             cursor.execute(sql, id)
@@ -135,7 +136,7 @@ class AgentDB:
             return "The operation was unsuccessful"
 
     def count_active_agent(self):
-        conn = self.conn
+        conn = self.conn.get_connections()
         cursor = conn.cursor(dictionary=True)
         active = cursor.execute("SELECT COUNT(*) AS counter FROM agents WHERE is_active = TRUE")
         cursor.fetchall()
