@@ -4,3 +4,5 @@
 2026-06-18 15:49:16,531 | INFO | post /agents
 2026-06-18 15:49:16,531 | INFO | create new agent
 2026-06-18 15:49:16,531 | ERROR | Invalid rank entered
+2026-06-18 16:37:45,645 | INFO | Connecting to a database
+2026-06-18 16:37:45,667 | INFO | Connecting to a database
