@@ -20,5 +20,27 @@ def get_agent_by_id(id):
         id = int(id)
         return agent_db.get_agent_by_id(id)
     except:
-        if id == int(id):
-            raise HTTPException(status_code=404)
+        try:
+            if id == int(id):
+                raise HTTPException(status_code=404)
+        except ValueError:
+            raise HTTPException(status_code=422)
+
+@router.put("/agents/{id}")
+def update_agent(id, data: dict):
+    try:
+        id = int(id)
+        return agent_db.update_agent(id, data)
+    except:
+        try:
+            if data == {} and id == int(id):
+                raise HTTPException(status_code=422)
+            elif id == int(id):
+                raise HTTPException(status_code=404)
+        except ValueError:
+            raise HTTPException(status_code=422)
+
+
+@router.put("/agents/{id}/deactivate")
+def deactivate_agent(id):
+    pass

@@ -55,20 +55,21 @@ class AgentDB:
 
 
     def update_agent(self, id, data):
+        conn = self.conn.get_connections()
+        cursor = conn.cursor()
         try:
-            conn = self.conn.get_connections()
-            cursor = conn.cursor()
             set_parts = [f"{key} = %s" for key in data.keys()]
             set_cluse = ", ".join(set_parts)
             sql = f"UPDATE agents SET {set_cluse} WHERE id = %s"
             val = list(data.values()) + [id]
             cursor.execute(sql, val)
             conn.commit()
-            cursor.close()
-            conn.close()
             return "The operation was successful"
         except:
-            return "The operation was unsuccessful"
+            raise HTTPException(status_code=404, detail="The operation was unsuccessful")
+        finally:
+            cursor.close()
+            conn.close()
 
 
 
